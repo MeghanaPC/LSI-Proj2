@@ -18,7 +18,7 @@ public class NormalReducer extends Reducer<Text,Text,Text,Text> {
 		for(Text val:values)
 		{
 			String input=val.toString();
-			String inputarr[]=input.split(";");
+			String inputarr[]=input.split("\\s+");
 			
 			if(inputarr.length>1)   //the original graph structure
 			{
@@ -39,7 +39,8 @@ public class NormalReducer extends Reducer<Text,Text,Text,Text> {
 		context.getCounter(MainClass.MRCounter.RESIDUAL).increment(residual);
 		// add code to add residual to hadoop counter
 		
-		String emitString=key.toString()+";"+newPR.toString()+";"+outEdges.split(",").length+";"+outEdges;
+		//String emitString=key.toString()+";"+newPR.toString()+";"+outEdges.split(",").length+";"+outEdges;
+		String emitString=newPR.toString()+" "+outEdges.split(",").length+" "+outEdges;
 		context.write(key, new Text(emitString));
 		
 	}

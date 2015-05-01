@@ -14,19 +14,21 @@ public class MainClass {
 	{
 		RESIDUAL;
 	}
-	public static final long  numNodes=685230;
-	public static final int numIterations=2;
+	//public static final long  numNodes=685230;
+	public static final long numNodes=3;
+	public static final int numIterations=10;
 	public static final double epsilon=0.001;
-	public static final int precision=100000;
+	public static final int precision=1000;      //can change precision as well
 	
 	 public static void main(String[] args) throws Exception {
 		   Configuration conf = new Configuration();
-		   double residual_error=9999999.9;
+		   double residual_error=99999.9;
 		   int count=0;
-		   while(count<numIterations)
+		   while(epsilon<residual_error)     //right now until convergence. can change it to while count<numIterations
 		   {
 			   
 			   Job job = new Job(conf, "MainClass"+count);
+			   job.setJarByClass(MainClass.class);
 			   job.setOutputKeyClass(Text.class);
 			   job.setOutputValueClass(Text.class);
 			       
@@ -50,11 +52,18 @@ public class MainClass {
 			   job.waitForCompletion(true);
 			   
 			   long residual=job.getCounters().findCounter(MRCounter.RESIDUAL).getValue();
-			   residual_error=(double)(residual/precision)/numNodes;
+			   System.out.println("summed up residual::::"+residual);
 			   
-			   System.out.println("Iteration : "+count+"-------"+"Residual : "+residual_error);
+			   residual_error=(residual/numNodes)/(double)precision;
+			   
+			   String residualErrorString = String.format("%.4f", residual_error);
+			   
+			   System.out.println("Iteration : "+count+"-------"+"Residual : "+residualErrorString);
 			   job.getCounters().findCounter(MRCounter.RESIDUAL).setValue(0L);
 			   ++count;
+			   
+			   
+			   
 		   }
 		       
 		       

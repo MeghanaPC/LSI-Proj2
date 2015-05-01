@@ -10,7 +10,7 @@ public class NormalMapper extends Mapper<LongWritable,Text,Text,Text>{
 	public void map(LongWritable key,Text value,Context context) throws IOException, InterruptedException
 	{
 		String input=value.toString();
-		String inputarr[]=input.split(";");
+		String inputarr[]=input.split("\\s+");
 		String nodeID=inputarr[0];
 		Double nodePR=new Double(inputarr[1]);
 		Integer nodeDegree=new Integer(inputarr[2]);
@@ -22,6 +22,8 @@ public class NormalMapper extends Mapper<LongWritable,Text,Text,Text>{
 		
 		
 		context.write(new Text(nodeID), new Text(input));
+		
+		System.out.println("input passed to mapper-------"+input);
 		if(nodeEdges!="")
 		{
 			Double newPR=nodePR/nodeDegree;    //won't be 0 if nodeEdges!=""
