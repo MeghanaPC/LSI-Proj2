@@ -8,10 +8,10 @@ public class NormalReducer extends Reducer<Text,Text,Text,Text> {
 	
 	public void reduce(Text key,Iterable<Text> values,Context context) throws IOException, InterruptedException
 	{
-		//val= nodeid ; pagerank ; #outgoingEdges ; outgoingEdgeList (delimited by ,)
+		//val= pagerank ; #outgoingEdges ; outgoingEdgeList (delimited by ,)
 		//val = partialPR
 		Double damp=0.85;
-		Long totalnodes=(long) 3;
+		Long totalnodes=MainClass.numNodes;
 		Double sumPR=0.0;
 		Double oldPR=0.0;
 		String outEdges="";
@@ -23,7 +23,8 @@ public class NormalReducer extends Reducer<Text,Text,Text,Text> {
 			if(inputarr.length>1)   //the original graph structure
 			{
 				oldPR=Double.parseDouble(inputarr[1]);
-				outEdges=inputarr[3];
+				if(inputarr.length==4)
+					outEdges=inputarr[3];
 				
 			}
 			else   // the new page rank

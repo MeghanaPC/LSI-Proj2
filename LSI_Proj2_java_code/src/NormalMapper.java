@@ -6,7 +6,7 @@ import org.apache.hadoop.mapreduce.Mapper;
 
 
 public class NormalMapper extends Mapper<LongWritable,Text,Text,Text>{
-	//file format nodeid ; pagerank ; #outgoingEdges ; outgoingEdgeList (delimited by ,)
+	//file format nodeid  pagerank  #outgoingEdges  outgoingEdgeList (delimited by ,)
 	public void map(LongWritable key,Text value,Context context) throws IOException, InterruptedException
 	{
 		String input=value.toString();
@@ -15,7 +15,7 @@ public class NormalMapper extends Mapper<LongWritable,Text,Text,Text>{
 		Double nodePR=new Double(inputarr[1]);
 		Integer nodeDegree=new Integer(inputarr[2]);
 		String nodeEdges="";
-		if(!(nodeDegree==0||inputarr.length<4))
+		if(inputarr.length==4)
 		{
 			nodeEdges=inputarr[3];
 		}
@@ -23,7 +23,7 @@ public class NormalMapper extends Mapper<LongWritable,Text,Text,Text>{
 		
 		context.write(new Text(nodeID), new Text(input));
 		
-		System.out.println("input passed to mapper-------"+input);
+		//System.out.println("input passed to mapper-------"+input);
 		if(nodeEdges!="")
 		{
 			Double newPR=nodePR/nodeDegree;    //won't be 0 if nodeEdges!=""
