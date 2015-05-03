@@ -154,7 +154,7 @@ public class BlockReducer extends Reducer<Text,Text,Text,Text> {
 		}
 		for(Double val : newPageRankMap.values()){
 			sumNewPR = sumNewPR + val;
-		}
+		} 
 		long residual=(long) Math.abs(((sumOldPR-sumNewPR)/sumNewPR)*MainClass.precision);
 		context.getCounter(MainClass.MRCounter.RESIDUAL).increment(residual);
 		// add code to add residual to hadoop counter

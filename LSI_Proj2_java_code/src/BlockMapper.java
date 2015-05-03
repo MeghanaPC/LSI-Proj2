@@ -36,7 +36,7 @@ public class BlockMapper extends Mapper<LongWritable,Text,Text,Text>{
 				context.write(new Text(blockID),new Text(neighborBlockID + " " + blockID + " " + newPR.toString()));
 			}
 			
-		}
+		} 
 		//Remove last comma
 		edgeListString = edgeListString.substring(0,edgeListString.length()-1);
 		context.write(new Text(blockID), new Text(MainClass.NODEINFO + " " + nodeID + " " + nodePR + " " + edgeListString));

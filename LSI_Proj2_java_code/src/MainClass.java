@@ -51,7 +51,7 @@ public class MainClass {
 			   FileOutputFormat.setOutputPath(job, new Path("output/file"+count));
 			       
 			   job.waitForCompletion(true);
-			   
+			    
 			   long residual=job.getCounters().findCounter(MRCounter.RESIDUAL).getValue();
 			   //System.out.println("summed up residual::::"+residual);
 			   
