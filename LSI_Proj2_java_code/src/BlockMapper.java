@@ -33,7 +33,7 @@ public class BlockMapper extends Mapper<LongWritable,Text,Text,Text>{
 			{
 				String neighborBlockID = blockIDFromNodeID(edgenode);
 				edgeListString += neighborBlockID + ":" + edgenode + ",";
-				context.write(new Text(blockID),new Text(neighborBlockID + " " + blockID + " " + newPR.toString()));
+				context.write(new Text(neighborBlockID),new Text(edgenode + " " + blockID + " " + newPR.toString()));
 			}
 			
 		} 

@@ -14,18 +14,19 @@ public class BlockedMainClass {
 	{
 		RESIDUAL;
 	}
-	public static final long  numNodes=685230;
+	public static final long  numNodes=5;
 	//public static final long numNodes=3;
-	public static final int numIterations=7;
+	public static final int numIterations=9;
 	public static final double epsilon=0.001;
 	public static final int precision=1000;      //can change precision as well
 	public static final String NODEINFO = "NODEINFO";
 	
 	 public static void main(String[] args) throws Exception {
 		   Configuration conf = new Configuration();
-		   double residual_error=0.0;
+		   double residual_error=1.0;
 		   int count=0;
-		   while(count<numIterations)     //right now until convergence. can change it to while count<numIterations
+		  // while(count<numIterations)     //right now until convergence. can change it to while count<numIterations
+		   while(residual_error >= epsilon)
 		   {
 			   
 			   Job job = new Job(conf, "BlockedMainClass"+count);

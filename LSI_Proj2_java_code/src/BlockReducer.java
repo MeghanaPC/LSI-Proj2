@@ -12,7 +12,7 @@ public class BlockReducer extends Reducer<Text, Text, Text, Text> {
 			throws IOException, InterruptedException {
 
 		Double damp = 0.85;
-		Long totalnodes = MainClass.numNodes;
+		Long totalnodes = BlockedMainClass.numNodes;
 
 		HashMap<String, Double> nodeToOldPRmap = new HashMap<String, Double>();
 		HashMap<String, String> incomingInternalEdgesMap = new HashMap<String, String>();
@@ -32,7 +32,7 @@ public class BlockReducer extends Reducer<Text, Text, Text, Text> {
 			String input = val.toString();
 			String inputarr[] = input.split("\\s+");
 
-			if (inputarr[0].equals(MainClass.NODEINFO)) {
+			if (inputarr[0].equals(BlockedMainClass.NODEINFO)) {
 				// received: Key:BlockID, Value:NODEINFO nodeID nodePR
 				// outgoingEgdes
 				Double PR = 0.0;
@@ -100,7 +100,7 @@ public class BlockReducer extends Reducer<Text, Text, Text, Text> {
 		 * for( v ∈ B ) { PR[v] = NPR[v]; } }
 		 */
 		int count = 0;
-		while (count < 10) {
+		while (count < 4) {
 			count++;
 			for (String nodeID : nodeToOldPRmap.keySet()) {
 				newPageRankMap.put(nodeID, 0.0);
@@ -118,7 +118,7 @@ public class BlockReducer extends Reducer<Text, Text, Text, Text> {
 						if (outEdges.equals("")) {
 							denom = 1;
 						} else {
-							denom = outEdges.split(":").length;
+							denom = outEdges.split(",").length;
 						}
 						npr = npr + nodeToOldPRmap.get(vertex) / denom;
 					}
@@ -148,8 +148,8 @@ public class BlockReducer extends Reducer<Text, Text, Text, Text> {
 			sumNewPR = sumNewPR + val;
 		}
 		long residual = (long) Math.abs(((sumOldPR - sumNewPR) / sumNewPR)
-				* MainClass.precision);
-		context.getCounter(MainClass.MRCounter.RESIDUAL).increment(residual);
+				* BlockedMainClass.precision);
+		context.getCounter(BlockedMainClass.MRCounter.RESIDUAL).increment(residual);
 		// add code to add residual to hadoop counter
 		// file format blockid nodeid pagerank #outgoingEdges outgoingEdgeList
 		// (delimited by ,)
