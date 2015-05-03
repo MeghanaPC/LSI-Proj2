@@ -19,6 +19,7 @@ public class MainClass {
 	public static final int numIterations=6;
 	public static final double epsilon=0.001;
 	public static final int precision=1000;      //can change precision as well
+	public static final String NODEINFO = "NODEINFO";
 	
 	 public static void main(String[] args) throws Exception {
 		   Configuration conf = new Configuration();
