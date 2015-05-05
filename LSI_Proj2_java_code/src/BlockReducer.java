@@ -181,7 +181,7 @@ public class BlockReducer extends Reducer<Text, Text, Text, NullWritable> {
 					+ degree + " " + neighborNodeString;
 			context.write(new Text(fileRecord), NullWritable.get());
 		}
-
+ 
 	}
 
 }

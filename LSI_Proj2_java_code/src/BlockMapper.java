@@ -21,7 +21,7 @@ public class BlockMapper extends Mapper<LongWritable,Text,Text,Text>{
 		{
 			nodeEdges=inputarr[3];
 		}
-		
+		 
 		String edgeListString = "";
 		
 		//System.out.println("input passed to mapper-------"+input);

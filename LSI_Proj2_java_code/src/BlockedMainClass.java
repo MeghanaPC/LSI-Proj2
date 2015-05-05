@@ -50,7 +50,7 @@ public class BlockedMainClass {
 		   }
 		   
 		   blockFileReader.close();
-		   
+		    
 		   BufferedWriter writer = new BufferedWriter(new FileWriter("residuals.txt"));
 
 		  // while(count<numIterations)     //right now until convergence. can change it to while count<numIterations
