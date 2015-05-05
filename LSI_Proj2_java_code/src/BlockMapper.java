@@ -7,19 +7,19 @@ import org.apache.hadoop.mapreduce.Mapper;
 
 
 public class BlockMapper extends Mapper<LongWritable,Text,Text,Text>{
-	//file format blockid nodeid pagerank #outgoingEdges outgoingEdgeList (delimited by ,)
+	//file format nodeid pagerank #outgoingEdges outgoingEdgeList (delimited by ,)
 	public void map(LongWritable key,Text value,Context context) throws IOException, InterruptedException
 	{
 		String input=value.toString();
 		String inputarr[]=input.split("\\s+");
-		String nodeID=inputarr[1];
-		String blockID = inputarr[0];
-		Double nodePR=new Double(inputarr[2]);
-		Integer nodeDegree=new Integer(inputarr[3]);
+		String nodeID=inputarr[0];
+		String blockID = blockIDFromNodeID(nodeID);
+		Double nodePR=new Double(inputarr[1]);
+		Integer nodeDegree=new Integer(inputarr[2]);
 		String nodeEdges="";
-		if(inputarr.length==5)
+		if(inputarr.length==4)
 		{
-			nodeEdges=inputarr[4];
+			nodeEdges=inputarr[3];
 		}
 		
 		String edgeListString = "";
@@ -35,10 +35,11 @@ public class BlockMapper extends Mapper<LongWritable,Text,Text,Text>{
 				edgeListString += neighborBlockID + ":" + edgenode + ",";
 				context.write(new Text(neighborBlockID),new Text(edgenode + " " + blockID + " " + newPR.toString()));
 			}
-			
+			edgeListString = edgeListString.substring(0,edgeListString.length()-1);
+
 		} 
-		//Remove last comma
-		edgeListString = edgeListString.substring(0,edgeListString.length()-1);
+		
+		//edgeListString = edgeListString.substring(0,edgeListString.length()-1);
 		context.write(new Text(blockID), new Text(MainClass.NODEINFO + " " + nodeID + " " + nodePR + " " + edgeListString));
 
 		
@@ -46,6 +47,7 @@ public class BlockMapper extends Mapper<LongWritable,Text,Text,Text>{
 
 	private String blockIDFromNodeID(String edgenode) {
 		//Dummy implementation:
+		/*
 		if(edgenode.equals("0") || edgenode.equals("1")){
 			return "0";
 		}else if(edgenode.equals("2")){
@@ -53,5 +55,40 @@ public class BlockMapper extends Mapper<LongWritable,Text,Text,Text>{
 		}else{
 			return "2";
 		}
+		*/
+		int nodeNum = Integer.parseInt(edgenode);
+		Integer blockNum = 0;
+		for( int i = 0; i < BlockedMainClass.blockNumberArray.length; i++){
+			if(nodeNum <  BlockedMainClass.blockNumberArray[i]){
+				blockNum = i;
+				break;
+			}
+		}
+		
+		return blockNum.toString();
+		/*
+		int nodeNum = Integer.parseInt(edgenode);
+		
+		Integer quotient = nodeNum/BlockedMainClass.blockSize;
+		int blockNum = BlockedMainClass.blockNumberArray[quotient];
+				
+		int prevBlockLimit = 0;
+		
+		if(quotient > 0){
+			prevBlockLimit = BlockedMainClass.blockNumberArray[quotient-1];
+		}
+		
+		if(nodeNum < blockNum){
+			if(nodeNum > prevBlockLimit){
+				return quotient.toString();
+			}else{
+				quotient = quotient-1;
+				return quotient.toString();
+			}
+		}else{
+			quotient = quotient+1;
+			return quotient.toString();
+		}
+		*/
 	}
 }

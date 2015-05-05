@@ -1,3 +1,8 @@
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.FileReader;
+import java.io.FileWriter;
+
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.Text;
@@ -14,17 +19,40 @@ public class BlockedMainClass {
 	{
 		RESIDUAL;
 	}
-	public static final long  numNodes=5;
+	public static final long  numNodes=685230;
 	//public static final long numNodes=3;
 	public static final int numIterations=9;
 	public static final double epsilon=0.001;
-	public static final int precision=1000;      //can change precision as well
+	public static final int precision=10000;      //can change precision as well
 	public static final String NODEINFO = "NODEINFO";
+	public static final int blockSize=10000;      //can change precision as well
+
 	
+	public static int blockNumberArray[];
+		
 	 public static void main(String[] args) throws Exception {
 		   Configuration conf = new Configuration();
 		   double residual_error=1.0;
 		   int count=0;
+		   
+		   blockNumberArray = new int[68];
+		   int index = 0;
+		   int prev = 0;
+
+		   BufferedReader blockFileReader = new BufferedReader(new FileReader(args[2]));
+		   String line = null;
+		   while((line = blockFileReader.readLine()) != null){
+			   if(index > 0){
+				   prev = blockNumberArray[index-1];
+			   }
+			   blockNumberArray[index] = prev + Integer.parseInt(line.trim());
+			   index++;
+		   }
+		   
+		   blockFileReader.close();
+		   
+		   BufferedWriter writer = new BufferedWriter(new FileWriter("residuals.txt"));
+
 		  // while(count<numIterations)     //right now until convergence. can change it to while count<numIterations
 		   while(residual_error >= epsilon)
 		   {
@@ -60,13 +88,14 @@ public class BlockedMainClass {
 			   
 			   String residualErrorString = String.format("%.4f", residual_error);
 			   
+			   writer.write("Iteration : "+count+"-------"+"Residual : "+residualErrorString);
+			   writer.newLine();
 			  // System.out.println("Iteration : "+count+"-------"+"Residual : "+residualErrorString);
 			   job.getCounters().findCounter(MRCounter.RESIDUAL).setValue(0L);
 			   ++count;			   
 			   
 		   }
-		       
-		       
+		   writer.close();
 		   
 		}
 }

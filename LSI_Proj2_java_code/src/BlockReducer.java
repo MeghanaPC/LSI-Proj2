@@ -6,7 +6,7 @@ import org.apache.hadoop.io.NullWritable;
 import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Reducer;
 
-public class BlockReducer extends Reducer<Text, Text, Text, Text> {
+public class BlockReducer extends Reducer<Text, Text, Text, NullWritable> {
 
 	public void reduce(Text key, Iterable<Text> values, Context context)
 			throws IOException, InterruptedException {
@@ -100,7 +100,7 @@ public class BlockReducer extends Reducer<Text, Text, Text, Text> {
 		 * for( v ∈ B ) { PR[v] = NPR[v]; } }
 		 */
 		int count = 0;
-		while (count < 4) {
+		while (count < 8) {
 			count++;
 			for (String nodeID : nodeToOldPRmap.keySet()) {
 				newPageRankMap.put(nodeID, 0.0);
@@ -140,7 +140,13 @@ public class BlockReducer extends Reducer<Text, Text, Text, Text> {
 			}
 		}
 
-		Double sumOldPR = 0.0, sumNewPR = 0.0;
+		Double sumOfResiduals = 0.0;
+		for (String node : OldPRmap.keySet()) {
+			Double newPR = newPageRankMap.get(node);
+			Double oldPR = OldPRmap.get(node);
+			sumOfResiduals = sumOfResiduals + ((oldPR - newPR)/newPR) ;
+		}
+		/*
 		for (Double val : OldPRmap.values()) {
 			sumOldPR = sumOldPR + val;
 		}
@@ -148,6 +154,8 @@ public class BlockReducer extends Reducer<Text, Text, Text, Text> {
 			sumNewPR = sumNewPR + val;
 		}
 		long residual = (long) Math.abs(((sumOldPR - sumNewPR) / sumNewPR)
+				* BlockedMainClass.precision);*/
+		long residual = (long) Math.abs(sumOfResiduals
 				* BlockedMainClass.precision);
 		context.getCounter(BlockedMainClass.MRCounter.RESIDUAL).increment(residual);
 		// add code to add residual to hadoop counter
@@ -156,16 +164,22 @@ public class BlockReducer extends Reducer<Text, Text, Text, Text> {
 
 		for (String nodeID : newPageRankMap.keySet()) {
 			String outEdges = nodeToOutEdgesMap.get(nodeID);
-			String edgesArray[] = outEdges.split(",");
+			String edgesArray[];
+			Integer degree = 0;
 			String neighborNodeString = "";
-			for (String blockEdgePair : edgesArray) {
-				String blockEdgeEntry[] = blockEdgePair.split(":");
-				String neighborNode = blockEdgeEntry[1];
-				neighborNodeString += neighborNode + ",";
+			if (!outEdges.equals("")) {
+				edgesArray = outEdges.split(",");
+
+				for (String blockEdgePair : edgesArray) {
+					String blockEdgeEntry[] = blockEdgePair.split(":");
+					String neighborNode = blockEdgeEntry[1];
+					neighborNodeString += neighborNode + ",";
+				}
+				degree = edgesArray.length;
 			}
 			String fileRecord = nodeID + " " + newPageRankMap.get(nodeID) + " "
-					+ edgesArray.length + " " + neighborNodeString;
-			context.write(new Text(blockID), new Text(fileRecord));
+					+ degree + " " + neighborNodeString;
+			context.write(new Text(fileRecord), NullWritable.get());
 		}
 
 	}
