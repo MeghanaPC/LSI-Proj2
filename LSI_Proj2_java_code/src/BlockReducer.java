@@ -100,8 +100,11 @@ public class BlockReducer extends Reducer<Text, Text, Text, NullWritable> {
 		 * for( v ∈ B ) { PR[v] = NPR[v]; } }
 		 */
 		int count = 0;
-		while (count < 8) {
-			count++;
+		int numIter=0;
+		
+		while (count <=9) {
+			++numIter;
+			++count;
 			for (String nodeID : nodeToOldPRmap.keySet()) {
 				newPageRankMap.put(nodeID, 0.0);
 			}
@@ -135,7 +138,23 @@ public class BlockReducer extends Reducer<Text, Text, Text, NullWritable> {
 				newPageRankMap.put(nodeID, npr);
 
 			}
-			for (String nodeID : nodeToOldPRmap.keySet()) {
+			/* ***************** */
+			Double sum_blockRes = 0.0;
+			for (String node : nodeToOldPRmap.keySet()) {
+				Double newPR_block = newPageRankMap.get(node);
+				Double oldPR_block = nodeToOldPRmap.get(node);
+				sum_blockRes = sum_blockRes + ((oldPR_block - newPR_block)/newPR_block) ;
+			}
+			
+			Double residual_block=sum_blockRes/(double)nodeToOldPRmap.keySet().size();
+			if(residual_block<=BlockedMainClass.epsilon)
+			{
+				break;
+			}
+			/* **************** */
+			
+			
+			for (String nodeID : newPageRankMap.keySet()) {
 				nodeToOldPRmap.put(nodeID, newPageRankMap.get(nodeID));
 			}
 		}
@@ -158,6 +177,7 @@ public class BlockReducer extends Reducer<Text, Text, Text, NullWritable> {
 		long residual = (long) Math.abs(sumOfResiduals
 				* BlockedMainClass.precision);
 		context.getCounter(BlockedMainClass.MRCounter.RESIDUAL).increment(residual);
+		context.getCounter(BlockedMainClass.MRCounter.AVERAGE_ITER).increment(numIter);
 		// add code to add residual to hadoop counter
 		// file format blockid nodeid pagerank #outgoingEdges outgoingEdgeList
 		// (delimited by ,)

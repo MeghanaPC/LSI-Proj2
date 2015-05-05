@@ -17,15 +17,16 @@ public class BlockedMainClass {
 
 	public static enum MRCounter
 	{
-		RESIDUAL;
+		RESIDUAL,AVERAGE_ITER;
 	}
 	public static final long  numNodes=685230;
 	//public static final long numNodes=3;
 	public static final int numIterations=9;
 	public static final double epsilon=0.001;
-	public static final int precision=10000;      //can change precision as well
+	public static final int precision=1000000;      //can change precision as well
 	public static final String NODEINFO = "NODEINFO";
 	public static final int blockSize=10000;      //can change precision as well
+	public static final int numBlocks=68;
 
 	
 	public static int blockNumberArray[];
@@ -51,7 +52,7 @@ public class BlockedMainClass {
 		   
 		   blockFileReader.close();
 		    
-		   BufferedWriter writer = new BufferedWriter(new FileWriter("residuals.txt"));
+		   BufferedWriter writer = new BufferedWriter(new FileWriter("residuals_fixedVariable.txt"));
 
 		  // while(count<numIterations)     //right now until convergence. can change it to while count<numIterations
 		   while(residual_error >= epsilon)
@@ -82,16 +83,19 @@ public class BlockedMainClass {
 			   job.waitForCompletion(true);
 			    
 			   long residual=job.getCounters().findCounter(MRCounter.RESIDUAL).getValue();
+			   long totalIter=job.getCounters().findCounter(MRCounter.AVERAGE_ITER).getValue();
+			   Double average_iter=(double)totalIter/numBlocks;
 			   //System.out.println("summed up residual::::"+residual);
 			   
-			   residual_error=(residual/numNodes)/(double)precision;
+			   residual_error=((double)residual/numNodes)/(double)precision;
 			   
-			   String residualErrorString = String.format("%.4f", residual_error);
+			   String residualErrorString = String.format("%.5f", residual_error);
 			   
-			   writer.write("Iteration : "+count+"-------"+"Residual : "+residualErrorString);
+			   writer.write("Iteration : "+count+"-------"+"Residual : "+residualErrorString+"----"+"avg iterations"+average_iter);
 			   writer.newLine();
 			  // System.out.println("Iteration : "+count+"-------"+"Residual : "+residualErrorString);
 			   job.getCounters().findCounter(MRCounter.RESIDUAL).setValue(0L);
+			   job.getCounters().findCounter(MRCounter.AVERAGE_ITER).setValue(0L);
 			   ++count;			   
 			   
 		   }
