@@ -30,7 +30,7 @@ public class BlockReducer extends Reducer<Text, Text, Text, NullWritable> {
 
 		for (Text val : values) {
 			String input = val.toString();
-			String inputarr[] = input.split("\\s+");
+			String inputarr[] = input.trim().split("\\s+");
 
 			if (inputarr[0].equals(BlockedMainClass.NODEINFO)) {
 				// received: Key:BlockID, Value:NODEINFO nodeID nodePR
@@ -102,7 +102,7 @@ public class BlockReducer extends Reducer<Text, Text, Text, NullWritable> {
 		int count = 0;
 		int numIter=0;
 		
-		while (count <=9) {
+		while (count <15) {
 			++numIter;
 			++count;
 			for (String nodeID : nodeToOldPRmap.keySet()) {
@@ -143,7 +143,8 @@ public class BlockReducer extends Reducer<Text, Text, Text, NullWritable> {
 			for (String node : nodeToOldPRmap.keySet()) {
 				Double newPR_block = newPageRankMap.get(node);
 				Double oldPR_block = nodeToOldPRmap.get(node);
-				sum_blockRes = sum_blockRes + ((oldPR_block - newPR_block)/newPR_block) ;
+				Double temp=Math.abs(oldPR_block - newPR_block);
+				sum_blockRes = sum_blockRes + (temp/newPR_block) ;
 			}
 			
 			Double residual_block=sum_blockRes/(double)nodeToOldPRmap.keySet().size();
@@ -163,7 +164,8 @@ public class BlockReducer extends Reducer<Text, Text, Text, NullWritable> {
 		for (String node : OldPRmap.keySet()) {
 			Double newPR = newPageRankMap.get(node);
 			Double oldPR = OldPRmap.get(node);
-			sumOfResiduals = sumOfResiduals + ((oldPR - newPR)/newPR) ;
+			Double temp1=Math.abs(oldPR - newPR);
+			sumOfResiduals = sumOfResiduals + (temp1/newPR) ;
 		}
 		/*
 		for (Double val : OldPRmap.values()) {

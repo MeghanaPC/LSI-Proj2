@@ -11,7 +11,7 @@ public class BlockMapper extends Mapper<LongWritable,Text,Text,Text>{
 	public void map(LongWritable key,Text value,Context context) throws IOException, InterruptedException
 	{
 		String input=value.toString();
-		String inputarr[]=input.split("\\s+");
+		String inputarr[]=input.trim().split("\\s+");
 		String nodeID=inputarr[0];
 		String blockID = blockIDFromNodeID(nodeID);
 		Double nodePR=new Double(inputarr[1]);
@@ -33,7 +33,9 @@ public class BlockMapper extends Mapper<LongWritable,Text,Text,Text>{
 			{
 				String neighborBlockID = blockIDFromNodeID(edgenode);
 				edgeListString += neighborBlockID + ":" + edgenode + ",";
-				context.write(new Text(neighborBlockID),new Text(edgenode + " " + blockID + " " + newPR.toString()));
+				if(!neighborBlockID.equals(blockID)){
+					context.write(new Text(neighborBlockID),new Text(edgenode + " " + blockID + " " + newPR.toString()));
+				}
 			}
 			edgeListString = edgeListString.substring(0,edgeListString.length()-1);
 
