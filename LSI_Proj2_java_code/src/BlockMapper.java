@@ -5,7 +5,7 @@ import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Mapper;
 
 
-
+/* newwwwwwwwwwwwww*/
 public class BlockMapper extends Mapper<LongWritable,Text,Text,Text>{
 	//file format nodeid pagerank #outgoingEdges outgoingEdgeList (delimited by ,)
 	public void map(LongWritable key,Text value,Context context) throws IOException, InterruptedException
@@ -42,7 +42,7 @@ public class BlockMapper extends Mapper<LongWritable,Text,Text,Text>{
 		} 
 		
 		//edgeListString = edgeListString.substring(0,edgeListString.length()-1);
-		context.write(new Text(blockID), new Text(MainClass.NODEINFO + " " + nodeID + " " + nodePR + " " + edgeListString));
+		context.write(new Text(blockID), new Text(BlockedMainClass.NODEINFO + " " + nodeID + " " + nodePR + " " + edgeListString));
 
 		
 	}
