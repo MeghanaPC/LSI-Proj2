@@ -5,7 +5,7 @@ import org.apache.hadoop.io.Text;
 import org.apache.hadoop.mapreduce.Mapper;
 
 
-/* newwwwwwwwwwwwww*/
+/* newwwwww*/
 public class BlockMapper extends Mapper<LongWritable,Text,Text,Text>{
 	//file format nodeid pagerank #outgoingEdges outgoingEdgeList (delimited by ,)
 	public void map(LongWritable key,Text value,Context context) throws IOException, InterruptedException
